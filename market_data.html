@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Solutions, LLC</title>
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <link href="css/styles.css" rel="stylesheet">
+    <link rel="icon" href="images/snaketext.png">
+</head>
+<body>
+    <div class="container">
+        <h1>Market Data</h1>
+        <h2>Prices</h2>
+        <pre id="prices">Loading prices...</pre>
+        <h2>Federal Economic Data</h2>
+        <pre id="fed-data">Loading federal data...</pre>
+    </div>
+    <script>
+        async function fetchMarketData() {
+            try {
+                const response = await fetch('https://snakesolutionsllc.pythonanywhere.com/get_data');
+                const data = await response.json();
+                const pricesElement = document.getElementById('prices');
+                const fedDataElement = document.getElementById('fed-data');
+                pricesElement.innerHTML = '';
+                fedDataElement.innerHTML = '';
+                for (const [key, value] of Object.entries(data.prices)) {
+                    pricesElement.innerHTML += `<strong>${key}</strong>: ${value}<br>`;
+                }
+                for (const [key, value] of Object.entries(data.fed_data)) {
+                    fedDataElement.innerHTML += `<strong>${key}</strong>: ${value}<br>`;
+                }
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                document.getElementById('prices').innerHTML = 'Error fetching market data.';
+            }
+        }
+        window.onload = fetchMarketData;
+    </script>    
+    <script src="js/bootstrap.min.js"></script>
+</body>
+</html>
