@@ -10,10 +10,12 @@
 </head>
 <body>
     <div class="container">
-        <h2>Prices</h2>
-        <pre id="prices">Loading prices...</pre>
+        <h2>Index Prices</h2>
+        <pre id="prices">Loading index prices...</pre>
         <h2>Federal Economic Data</h2>
         <pre id="fed-data">Loading federal data...</pre>
+        <h2>Foreign Exchange Rates</h2>
+        <pre id="forex-data">Loading foreign exchange rates...</pre>
     </div>
     <script>
         async function fetchMarketData() {
@@ -31,11 +33,29 @@
                     fedDataElement.innerHTML += `<strong>${key}</strong>: ${value}<br>`;
                 }
             } catch (error) {
-                console.error('Error fetching data:', error);
+                console.error('Error fetching market data:', error);
                 document.getElementById('prices').innerHTML = 'Error fetching market data.';
             }
         }
-        window.onload = fetchMarketData;
+        async function fetchForexData() {
+            try {
+                const response = await fetch('https://snakesolutionsllc.pythonanywhere.com/forex');
+                const data = await response.json();
+                const forexElement = document.getElementById('forex-data');
+                forexElement.innerHTML = '';
+                for (const [key, value] of Object.entries(data)) {
+                    forexElement.innerHTML += `<strong>${key}</strong>: ${value}<br>`;
+                }
+            } catch (error) {
+                console.error('Error fetching foreign exchange data:', error);
+                document.getElementById('forex-data').innerHTML = 'Error fetching foreign exchange rates.';
+            }
+        }
+
+        window.onload = function() {
+            fetchMarketData();
+            fetchForexData();
+        };
     </script>    
     <script src="js/bootstrap.min.js"></script>
 </body>
