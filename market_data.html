@@ -3,35 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Solutions, LLC</title>
-    <link href="css/bootstrap.css" rel="stylesheet">
-    <link href="css/styles.css" rel="stylesheet">
+    <title>Market Data</title>
     <link rel="icon" href="images/snaketext.png">
+    <style>
+        table {
+            border-collapse: collapse;
+            table-layout: fixed;
+            max-width: 1000px;
+            margin: 0 auto;
+            font-size: 1.25rem;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 4px;
+            text-align: left;
+            word-wrap: break-word;
+        }
+        th {
+            text-align: center;
+            background-color: #f2f2f2;
+            font-size: 1.25rem;
+        }
+        td {
+            white-space: nowrap;
+        }
+        .positive {
+            color: rgb(6, 197, 6);
+        }
+        .negative {
+            color: rgb(211, 27, 27);
+        }
+        .neutral {
+            color: rgb(0, 0, 0);
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <h2>Index Prices</h2>
-        <pre id="prices">Loading index prices...</pre>
-        <h2>Federal Economic Data</h2>
-        <pre id="fed-data">Loading federal data...</pre>
-        <h2>Foreign Exchange Rates</h2>
-        <pre id="forex-data">Loading foreign exchange rates...</pre>
-        <h2>Crypto Prices</h2>
-        <pre id="crypto-data">Loading crypto prices...</pre>
+        <table class="table">
+            <tr>
+                <th colspan="3">Index Prices</th>
+            </tr>
+            <tr>
+                <th>Index</th>
+                <th>Value</th>
+                <th>Change</th>
+            </tr>
+            <tbody id="index-prices">
+            </tbody>
+            <tr>
+                <th colspan="3">Federal Economic Data</th>
+            </tr>
+            <tr>
+                <th>Indicator</th>
+                <th>Value</th>
+                <th>Change</th>
+            </tr>
+            <tbody id="fed-data">
+            </tbody>
+            <tr>
+                <th colspan="3">Foreign Exchange Rates</th>
+            </tr>
+            <tr>
+                <th>Currency Pair</th>
+                <th>Value</th>
+                <th>Change</th>
+            </tr>
+            <tbody id="forex-rates">
+            </tbody>
+            <tr>
+                <th colspan="3">Crypto Prices</th>
+            </tr>
+            <tr>
+                <th>Cryptocurrency</th>
+                <th>Value</th>
+                <th>Change</th>
+            </tr>
+            <tbody id="crypto-prices">
+            </tbody>
+        </table>
     </div>
     <script>
-        async function fetchPrices() {
+        function createRow(item, price, change) {
+            let priceClass = 'neutral';
+            let changeClass = 'neutral';
+            const changeValue = parseFloat(change.replace('%', ''));
+            if (changeValue > 0) {
+                priceClass = 'positive';
+                changeClass = 'positive';
+            } else if (changeValue < 0) {
+                priceClass = 'negative';
+                changeClass = 'negative';
+            }
+            return `<tr>
+                        <td>${item}</td>
+                        <td class="${priceClass}">${price}</td>
+                        <td class="${changeClass}">(${change})</td>
+                    </tr>`;
+        }
+        async function fetchIndexPrices() {
             try {
                 const response = await fetch('https://snakesolutionsllc.pythonanywhere.com/index_prices');
                 const data = await response.json();
-                const pricesElement = document.getElementById('prices');
-                pricesElement.innerHTML = '';
+                const indexPricesElement = document.getElementById('index-prices');
+                indexPricesElement.innerHTML = '';
                 for (const [key, value] of Object.entries(data)) {
-                    pricesElement.innerHTML += `<strong>${key}</strong>: ${value}<br>`;
+                    const price = value.price;
+                    const change = value.change;
+                    indexPricesElement.innerHTML += createRow(key, price, change);
                 }
             } catch (error) {
                 console.error('Error fetching index prices:', error);
-                document.getElementById('prices').innerHTML = 'Error fetching index prices.';
             }
         }
         async function fetchFedData() {
@@ -41,48 +123,50 @@
                 const fedDataElement = document.getElementById('fed-data');
                 fedDataElement.innerHTML = '';
                 for (const [key, value] of Object.entries(data)) {
-                    fedDataElement.innerHTML += `<strong>${key}</strong>: ${value}<br>`;
+                    const price = value.price;
+                    const change = value.change;
+                    fedDataElement.innerHTML += createRow(key, price, change);
                 }
             } catch (error) {
-                console.error('Error fetching federal data:', error);
-                document.getElementById('fed-data').innerHTML = 'Error fetching federal data.';
+                console.error('Error fetching federal economic data:', error);
             }
         }
-        async function fetchForexData() {
+        async function fetchForexRates() {
             try {
                 const response = await fetch('https://snakesolutionsllc.pythonanywhere.com/forex_rates');
                 const data = await response.json();
-                const forexElement = document.getElementById('forex-data');
-                forexElement.innerHTML = '';
+                const forexRatesElement = document.getElementById('forex-rates');
+                forexRatesElement.innerHTML = '';
                 for (const [key, value] of Object.entries(data)) {
-                    forexElement.innerHTML += `<strong>${key}</strong>: ${value}<br>`;
+                    const price = value.price;
+                    const change = value.change;
+                    forexRatesElement.innerHTML += createRow(key, price, change);
                 }
             } catch (error) {
-                console.error('Error fetching foreign exchange data:', error);
-                document.getElementById('forex-data').innerHTML = 'Error fetching foreign exchange rates.';
+                console.error('Error fetching forex rates:', error);
             }
         }
-        async function fetchCryptoData() {
+        async function fetchCryptoPrices() {
             try {
                 const response = await fetch('https://snakesolutionsllc.pythonanywhere.com/crypto_prices');
                 const data = await response.json();
-                const cryptoElement = document.getElementById('crypto-data');
-                cryptoElement.innerHTML = '';
+                const cryptoPricesElement = document.getElementById('crypto-prices');
+                cryptoPricesElement.innerHTML = '';
                 for (const [key, value] of Object.entries(data)) {
-                    cryptoElement.innerHTML += `<strong>${key}</strong>: ${value}<br>`;
+                    const price = value.price;
+                    const change = value.change;
+                    cryptoPricesElement.innerHTML += createRow(key, price, change);
                 }
             } catch (error) {
                 console.error('Error fetching crypto prices:', error);
-                document.getElementById('crypto-data').innerHTML = 'Error fetching crypto prices.';
             }
         }
         window.onload = function() {
-            fetchPrices();
+            fetchIndexPrices();
             fetchFedData();
-            fetchForexData();
-            fetchCryptoData();
+            fetchForexRates();
+            fetchCryptoPrices();
         };
     </script>    
-    <script src="js/bootstrap.min.js"></script>
 </body>
 </html>
