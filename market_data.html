@@ -49,10 +49,10 @@
     <div class="container">
         <table class="table">
             <tr>
-                <th colspan="3">Index Prices</th>
+                <th colspan="3">Index / Spot Prices</th>
             </tr>
             <tr>
-                <th>Index</th>
+                <th>Index / Spot</th>
                 <th>Value</th>
                 <th>Change</th>
             </tr>
@@ -91,6 +91,10 @@
         </table>
     </div>
     <script>
+        const indexOrder = ["10 Year Treasury", "2 Year Treasury", "Oil (Crude)", "Dow Jones", "NASDAQ", "S&P 500", "Gold"];
+        const fedOrder = ["30 Year Mortgage Rate (W/W)", "Unemployment Rate (M/M)", "Fed Target Range", "Real GDP Growth (Q/Q)", "Inflation Rate (M/M)"];
+        const forexOrder = ["USD/POUND", "USD/EUR", "USD/YEN"];
+        const cryptoOrder = ["BTC-USD", "ETH-USD"];
         function createRow(item, price, change) {
             let priceClass = 'neutral';
             let changeClass = 'neutral';
@@ -114,14 +118,25 @@
                 const data = await response.json();
                 const indexPricesElement = document.getElementById('index-prices');
                 indexPricesElement.innerHTML = '';
-                for (const [key, value] of Object.entries(data)) {
-                    const price = value.price;
-                    const change = value.change;
-                    indexPricesElement.innerHTML += createRow(key, price, change);
-                }
+                indexOrder.forEach(key => {
+                    if (data[key]) {
+                        const price = data[key].price;
+                        const change = data[key].change;
+                        indexPricesElement.innerHTML += createRow(key, price, change);
+                    }
+                });
             } catch (error) {
                 console.error('Error fetching index prices:', error);
             }
+        }
+        function getMatchingKey(data, baseKey) {
+            const regex = new RegExp(`^${baseKey}`);
+            for (const key in data) {
+                if (regex.test(key)) {
+                    return key;
+                }
+            }
+            return null;
         }
         async function fetchFedData() {
             try {
@@ -129,11 +144,15 @@
                 const data = await response.json();
                 const fedDataElement = document.getElementById('fed-data');
                 fedDataElement.innerHTML = '';
-                for (const [key, value] of Object.entries(data)) {
-                    const price = value.price;
-                    const change = value.change;
-                    fedDataElement.innerHTML += createRow(key, price, change);
-                }
+                fedOrder.forEach(key => {
+                    const actualKey = key === 'Fed Target Range' ? getMatchingKey(data, key) : key;
+                    
+                    if (actualKey && data[actualKey]) {
+                        const price = data[actualKey].price;
+                        const change = data[actualKey].change;
+                        fedDataElement.innerHTML += createRow(actualKey, price, change);
+                    }
+                });
             } catch (error) {
                 console.error('Error fetching federal economic data:', error);
             }
@@ -144,11 +163,13 @@
                 const data = await response.json();
                 const forexRatesElement = document.getElementById('forex-rates');
                 forexRatesElement.innerHTML = '';
-                for (const [key, value] of Object.entries(data)) {
-                    const price = value.price;
-                    const change = value.change;
-                    forexRatesElement.innerHTML += createRow(key, price, change);
-                }
+                forexOrder.forEach(key => {
+                    if (data[key]) {
+                        const price = data[key].price;
+                        const change = data[key].change;
+                        forexRatesElement.innerHTML += createRow(key, price, change);
+                    }
+                });
             } catch (error) {
                 console.error('Error fetching forex rates:', error);
             }
@@ -159,11 +180,13 @@
                 const data = await response.json();
                 const cryptoPricesElement = document.getElementById('crypto-prices');
                 cryptoPricesElement.innerHTML = '';
-                for (const [key, value] of Object.entries(data)) {
-                    const price = value.price;
-                    const change = value.change;
-                    cryptoPricesElement.innerHTML += createRow(key, price, change);
-                }
+                cryptoOrder.forEach(key => {
+                    if (data[key]) {
+                        const price = data[key].price;
+                        const change = data[key].change;
+                        cryptoPricesElement.innerHTML += createRow(key, price, change);
+                    }
+                });
             } catch (error) {
                 console.error('Error fetching crypto prices:', error);
             }
@@ -174,6 +197,6 @@
             fetchForexRates();
             fetchCryptoPrices();
         };
-    </script>    
+    </script>
 </body>
 </html>
