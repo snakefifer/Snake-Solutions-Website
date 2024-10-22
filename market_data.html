@@ -18,28 +18,38 @@
         <pre id="forex-data">Loading foreign exchange rates...</pre>
     </div>
     <script>
-        async function fetchMarketData() {
+        async function fetchPrices() {
             try {
-                const response = await fetch('https://snakesolutionsllc.pythonanywhere.com/get_data');
+                const response = await fetch('https://snakesolutionsllc.pythonanywhere.com/index_prices');
                 const data = await response.json();
                 const pricesElement = document.getElementById('prices');
-                const fedDataElement = document.getElementById('fed-data');
                 pricesElement.innerHTML = '';
-                fedDataElement.innerHTML = '';
-                for (const [key, value] of Object.entries(data.prices)) {
+                for (const [key, value] of Object.entries(data)) {
                     pricesElement.innerHTML += `<strong>${key}</strong>: ${value}<br>`;
                 }
-                for (const [key, value] of Object.entries(data.fed_data)) {
+            } catch (error) {
+                console.error('Error fetching index prices:', error);
+                document.getElementById('prices').innerHTML = 'Error fetching index prices.';
+            }
+        }
+
+        async function fetchFedData() {
+            try {
+                const response = await fetch('https://snakesolutionsllc.pythonanywhere.com/fed_data');
+                const data = await response.json();
+                const fedDataElement = document.getElementById('fed-data');
+                fedDataElement.innerHTML = '';
+                for (const [key, value] of Object.entries(data)) {
                     fedDataElement.innerHTML += `<strong>${key}</strong>: ${value}<br>`;
                 }
             } catch (error) {
-                console.error('Error fetching market data:', error);
-                document.getElementById('prices').innerHTML = 'Error fetching market data.';
+                console.error('Error fetching federal data:', error);
+                document.getElementById('fed-data').innerHTML = 'Error fetching federal data.';
             }
         }
         async function fetchForexData() {
             try {
-                const response = await fetch('https://snakesolutionsllc.pythonanywhere.com/forex');
+                const response = await fetch('https://snakesolutionsllc.pythonanywhere.com/forex_rates');
                 const data = await response.json();
                 const forexElement = document.getElementById('forex-data');
                 forexElement.innerHTML = '';
@@ -53,7 +63,8 @@
         }
 
         window.onload = function() {
-            fetchMarketData();
+            fetchPrices();
+            fetchFedData();
             fetchForexData();
         };
     </script>    
