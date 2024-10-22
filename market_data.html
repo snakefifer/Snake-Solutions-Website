@@ -16,6 +16,8 @@
         <pre id="fed-data">Loading federal data...</pre>
         <h2>Foreign Exchange Rates</h2>
         <pre id="forex-data">Loading foreign exchange rates...</pre>
+        <h2>Crypto Prices</h2>
+        <pre id="crypto-data">Loading crypto prices...</pre>
     </div>
     <script>
         async function fetchPrices() {
@@ -32,7 +34,6 @@
                 document.getElementById('prices').innerHTML = 'Error fetching index prices.';
             }
         }
-
         async function fetchFedData() {
             try {
                 const response = await fetch('https://snakesolutionsllc.pythonanywhere.com/fed_data');
@@ -61,11 +62,25 @@
                 document.getElementById('forex-data').innerHTML = 'Error fetching foreign exchange rates.';
             }
         }
-
+        async function fetchCryptoData() {
+            try {
+                const response = await fetch('https://snakesolutionsllc.pythonanywhere.com/crypto_prices');
+                const data = await response.json();
+                const cryptoElement = document.getElementById('crypto-data');
+                cryptoElement.innerHTML = '';
+                for (const [key, value] of Object.entries(data)) {
+                    cryptoElement.innerHTML += `<strong>${key}</strong>: ${value}<br>`;
+                }
+            } catch (error) {
+                console.error('Error fetching crypto prices:', error);
+                document.getElementById('crypto-data').innerHTML = 'Error fetching crypto prices.';
+            }
+        }
         window.onload = function() {
             fetchPrices();
             fetchFedData();
             fetchForexData();
+            fetchCryptoData();
         };
     </script>    
     <script src="js/bootstrap.min.js"></script>
