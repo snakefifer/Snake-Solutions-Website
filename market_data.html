@@ -229,7 +229,7 @@
 
     async function fetchMarketData(endpoint, orderArray, tableBodyId) {
       try {
-        const response = await fetch(`https://snakesolutionsllc.pythonanywhere.com/${endpoint}`);
+        const response = await fetch(`https://market-data-app.onrender.com/${endpoint}`);
         const data = await response.json();
         const tableBody = document.getElementById(tableBodyId);
         tableBody.innerHTML = "";
@@ -255,7 +255,7 @@
 
     async function fetchFedData() {
       try {
-        const response = await fetch("https://snakesolutionsllc.pythonanywhere.com/fed_data");
+        const response = await fetch(`https://market-data-app.onrender.com/fed_data`);
         const data = await response.json();
         const tableBody = document.getElementById("fed-data");
         tableBody.innerHTML = "";
